@@ -25,10 +25,10 @@ def get_currency_rate(date, currency_code):
     currency_data = data["Valute"].get(currency_code)
     if not currency_data:
         raise ValueError(f"No data for currency {currency_code}")
-    rates = {"date": date, "currency_code": currency_code, "rate": currency_data["Value"]}
+    rates = {"date": date.strftime("%d.%m.%Y"), "currency_code": currency_code, "rate": currency_data["Value"]}
 
-    # with open("user_settings.json", "w") as file:
-    #     json.dump(rates, file)
+    with open("user_settings.json", "a") as file:
+        json.dump(rates, file)
 
     return rates
 

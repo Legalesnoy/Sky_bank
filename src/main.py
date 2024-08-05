@@ -20,12 +20,13 @@ if __name__ == "__main__":
     for t in top:
         print(f"  {abs(float(t['Сумма операции']))} {t['Валюта операции']} - {t['Описание']} {t['Категория']}")
 
+    valute_lst = ['USD', 'EUR', 'CNY', 'BYN', 'JPY']
+    print(f"Курс валют на {datetime.datetime.now().date().strftime("%d.%m.%Y")}:")
 
-    print(get_currency_rate(datetime.datetime.now().date(),'USD'))
-    print(get_currency_rate(datetime.datetime.now().date(),'EUR'))
-    print(get_currency_rate(datetime.datetime.now().date(),'CNY'))
-    print(get_currency_rate(datetime.datetime.now().date(),'BYN'))
-    print(get_currency_rate(datetime.datetime.now().date(),'JPY'))
+    for v in valute_lst:
+        course = get_currency_rate(datetime.datetime.now().date(),v)
+        print(f"{v} = {course['rate']}")
+
 """
 Задачи по категориям:
    1. Веб-страницы:
