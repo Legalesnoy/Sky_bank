@@ -1,18 +1,16 @@
-import _io
 import datetime
-import json
-from typing import List, Dict, IO
-import pandas as pd
 import re
-from collections import Counter, abc
+from typing import List, Dict
+
+import pandas as pd
 
 """
-Basic functions for generating JSON responses
-Основные функции для генерации JSON-ответов
+The module of basic functions for generating JSON responses
+Модуль основных функций для генерации JSON-ответов
 """
 
 """
-Реализуйте набор функций и главную функцию, принимающую на вход строку с датой и временем в формате 
+Реализован набор функций и главную функцию, принимающую на вход строку с датой и временем в формате 
 YYYY-MM-DD HH:MM:SS  и возвращающую JSON-ответ со следующими данными:
 
 Приветствие в формате 
@@ -22,9 +20,6 @@ YYYY-MM-DD HH:MM:SS  и возвращающую JSON-ответ со следу
     общая сумма расходов total_expenses;
     кешбэк (1 рубль на каждые 100 рублей).
 2. Топ-5 транзакций по сумме платежа.
-3. Курс валют.
-4. Стоимость акций из S&P500.
-
 """
 
 
@@ -36,10 +31,11 @@ def expenses(transactions: List[Dict]) -> Dict:
         sum_op = float(trans['Сумма операции'])
 
         if sum_op < 0:
-            exp_dict[trans['Номер карты']] = exp_dict.get(trans['Номер карты'],list())
+            exp_dict[trans['Номер карты']] = exp_dict.get(trans['Номер карты'], list())
             exp_dict[trans['Номер карты']].append(sum_op)
 
     return exp_dict
+
 
 def total_expenses(transactions: List[Dict]) -> Dict:
     """функция возвращающая общую сумму расходов по каждой карте"""
@@ -50,7 +46,8 @@ def total_expenses(transactions: List[Dict]) -> Dict:
 
     return total_exp_dict
 
-def cashback(transactions: List[Dict]) -> Dict:
+
+def cashback(transactions: List[Dict]) -> dict:
     """функция возвращающая расчёт суммы кэшбэка с расходов по каждой карте"""
     cash = {}
     exp = expenses(transactions)
@@ -58,16 +55,17 @@ def cashback(transactions: List[Dict]) -> Dict:
     for k, v in exp.items():
         for e in v:
             cash[k] = cash.get(k, 0.0)
-            cash[k] = round(cash[k],2) + abs(round(e/100, 2))
+            cash[k] = round(cash[k], 2) + abs(round(e / 100, 2))
 
     return cash
 
 
-def top5(transactions: List[Dict]) -> Dict:
+def top5(transactions: List[Dict]) -> list[dict]:
     """функция возвращающая топ 5 транзакций по сумме платежа"""
 
-    transactions.sort(key = lambda x: float(x['Сумма операции']))
+    transactions.sort(key=lambda x: float(x['Сумма операции']))
     return transactions[0:5]
+
 
 def greeting(hour: int | None = None) -> str:
     """функция приветсвия входящие параметры - значение времени"""
@@ -135,6 +133,7 @@ def str_to_data(date_string: str) -> datetime.datetime:
         date_obj = datetime.datetime.strptime(date_string, "%d.%m.%Y %H:%M:%S")
 
     return date_obj
+
 
 if __name__ == "__main__":
     print(greeting())

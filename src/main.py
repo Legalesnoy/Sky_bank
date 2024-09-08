@@ -1,6 +1,6 @@
 import datetime
 
-from src.utils import get_currency_rate
+from src.utils import get_currency_rate2, get_spx_index
 from src.views import greeting, total_expenses, get_transactions, search_tr_in_data, str_to_data, top5, cashback
 from collections import abc
 if __name__ == "__main__":
@@ -20,12 +20,15 @@ if __name__ == "__main__":
     for t in top:
         print(f"  {abs(float(t['Сумма операции']))} {t['Валюта операции']} - {t['Описание']} {t['Категория']}")
 
-    valute_lst = ['USD', 'EUR', 'CNY', 'BYN', 'JPY']
-    print(f"Курс валют на {datetime.datetime.now().date().strftime("%d.%m.%Y")}:")
-
-    for v in valute_lst:
-        course = get_currency_rate(datetime.datetime.now().date(),v)
-        print(f"{v} = {course['rate']}")
+    valute_lst = ('USD', 'EUR', 'CNY', 'BYN', 'JPY')
+    print(f"\nКурс валют на {datetime.datetime.now().date().strftime("%d.%m.%Y")}:")
+    course = get_currency_rate2(datetime.datetime.now().date(), valute_lst)
+    for rate in course:
+        print(f"{rate['currency_code']} = {rate['rate']}")
+    print("\nКурс S&P500:")
+    spx_lst = ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA"]
+    for spx in spx_lst:
+        print(spx, get_spx_index(spx)['price'])
 
 """
 Задачи по категориям:
