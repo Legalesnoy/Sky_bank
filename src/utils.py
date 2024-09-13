@@ -20,8 +20,20 @@ API_KEY = os.getenv("API_KEY")
 """
 
 
-def str_to_date(date_str: str):
+def str_to_date(date_str: str) -> datetime.datetime:
     """функция преобразует строку в формат datetime"""
+    time_str = '00:00:00'
+
+    if len(date_str) > len('01/01/1999 '):
+        str_1, str_2 = date_str.split(' ', 1)
+        if ':' in str_1:
+            time_str, date_str = str_1, str_2
+        elif ':' in str_2:
+            time_str, date_str = str_2, str_1
+
+    time_format = "%H:%M:%S"
+    time_ = datetime.datetime.strptime(time_str, time_format).time()
+
     try:
         date_lst = list(map(int, re.findall(r"\d+", date_str)))
         d_year = [y for y in date_lst if y > 31][-1]
@@ -29,7 +41,8 @@ def str_to_date(date_str: str):
         d_month = [m for m in date_lst if 0 < m <= 12][-1]
         date_lst.remove(d_month)
         d_day = date_lst[0]
-        return datetime.datetime(year=d_year, month=d_month, day=d_day)
+        return datetime.datetime(year=d_year, month=d_month, day=d_day,
+                                 hour=time_.hour, minute=time_.minute, second=time_.second)
     except ValueError:
         raise ValueError("Неверный формат даты")
 
@@ -78,7 +91,7 @@ def get_currency_rate2(date: str | datetime.date, currency_code: Tuple[str, ...]
     for rate in currency_data:
         rates.append({'date': date.strftime("%d.%m.%Y"),
                       'currency_code': rate.get('CharCode'),
-                      'rate': round(float(rate.get('VunitRate').replace(',','.')),2)})
+                      'rate': round(float(rate.get('VunitRate').replace(',', '.')), 2)})
 
     with open("user_settings.json", "w") as file:
         json.dump(rates, file)

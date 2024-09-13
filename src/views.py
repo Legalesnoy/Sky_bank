@@ -1,12 +1,15 @@
 import datetime
 import re
 from typing import List, Dict
+import json
 
 import pandas as pd
 
+from src.decorators import to_json, apply_decorator
+
 """
 The module of basic functions for generating JSON responses
-Модуль основных функций для генерации JSON-ответов
+ 
 """
 
 """
@@ -99,26 +102,28 @@ def get_transactions(file_name: str) -> List[Dict]:
 def search_transactions(transactions: List[Dict], search_data: str) -> List[Dict]:
     """функция поиска данных о банковских операций"""
     result = []
+    search_data = search_data.lower()
 
     for transaction in transactions:
-
         t_str = str(transaction).lower()
-        pattern = re.compile(search_data.lower())
-
-        if re.search(pattern, t_str, flags=0) is not None:
+        if search_data in t_str:
             result.append(transaction)
 
     return result
 
 
-def search_tr_in_data(transactions: List[Dict], date_max: datetime.datetime) -> List[Dict]:
+def search_tr_in_data(transactions: List[Dict], date_max: datetime.datetime, date_min=None) -> List[Dict]:
     """функция поиска данных о банковских операций на диапазон дат"""
     result = []
-    date_min = date_max.replace(day=1, hour=0, minute=0, second=0)
+    if date_min is None:
+        date_min = date_max.replace(day=1)
+
+    date_min_ = min(date_max, date_min)
+    date_max_ = max(date_max, date_min)
 
     for trans in transactions:
         dt = str_to_data(trans['Дата операции'])
-        if date_min <= dt <= date_max:
+        if date_min_ <= dt <= date_max_:
             result.append(trans)
 
     return result
@@ -136,23 +141,29 @@ def str_to_data(date_string: str) -> datetime.datetime:
 
 
 if __name__ == "__main__":
-    print(greeting())
-    # print(str_to_data('31.12.2021'))
+    greeting, top5, cashback, total_expenses, expenses = apply_decorator([greeting, top5, cashback,
+                                                                          total_expenses, expenses], to_json)
+    print(greeting(10))
     tr = get_transactions("..\\data\\operations.xlsx")
-    print(search_transactions(tr, '31.12.2021 16:42:04'))
-    # dd = search_tr_in_data(tr, str_to_data('31.12.2021 16:42:04'))
-    # for d in dd:
-    #     print(d)
-    print(total_expenses(search_tr_in_data(tr, str_to_data('31.12.2021 16:42:04'))))
-    print(cashback(search_tr_in_data(tr, str_to_data('31.12.2021 16:42:04'))))
-    print(top5(search_tr_in_data(tr, str_to_data('31.12.2021 16:42:04'))))
-    # with open("..\\data\\operations.xlsx", "rb") as file1:
-    #     df1 = pd.read_excel(file1,header=0, nrows=0)
-    #     df2 = pd.read_excel(file1, skipfooter=2)
-    # print(extension := file1.name.split(".")[-1])
-    # print(df1.to_dict())
-    # print(df2.shape)
-    #
+    print(top5(tr))
+    l = search_transactions(tr, '*5091')
+    input(f'найдено {len(l)} записей')
+    for t in l:
+        print(t, '\n')
+
+    # # dd = search_tr_in_data(tr, str_to_data('31.12.2021 16:42:04'))
+    # # for d in dd:
+    # #     print(d)
+    # print(total_expenses(search_tr_in_data(tr, str_to_data('31.12.2021 16:42:04'))))
+    # print(cashback(search_tr_in_data(tr, str_to_data('31.12.2021 16:42:04'))))
+    # print(top5(search_tr_in_data(tr, str_to_data('31.12.2021 16:42:04'))))
+    # # with open("..\\data\\operations.xlsx", "rb") as file1:
+    # #     df1 = pd.read_excel(file1,header=0, nrows=0)
+    # #     df2 = pd.read_excel(file1, skipfooter=2)
+    # # print(extension := file1.name.split(".")[-1])
+    # # print(df1.to_dict())
+    # # print(df2.shape)
+    # #
     #
     #     n_rows = pd.read_excel(file1,usecols='A')
     # print(n_rows.shape[0])
