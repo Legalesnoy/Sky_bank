@@ -10,10 +10,6 @@ def df_to_list(transactions: pd.DataFrame):
     return list(transactions.to_dict('index').values())
 
 
-def list_dict_to_df(transactions: List[Dict]):
-    return pd.DataFrame(transactions)
-
-
 def spending_by_category(transactions: pd.DataFrame | List[Dict], name_category: str,
                          date1: str | datetime.datetime = None, date2: str | datetime.datetime = None):
     """Функция возвращает траты по заданной категории за последние три месяца (от переданной даты)"""
@@ -42,7 +38,7 @@ def spending_by_category(transactions: pd.DataFrame | List[Dict], name_category:
     result = search_transactions(data_lst, f"'Категория': '{name_category}'")
     result = search_tr_in_data(result, date1, date2)
 
-    return list_dict_to_df(result)
+    return pd.DataFrame(result)
 
 
 def spending_by_weekday(transactions: pd.DataFrame | List[Dict],
