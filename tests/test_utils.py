@@ -7,7 +7,7 @@ def test_str_to_date():
     test_str = '1/12/2021'
     assert str_to_date(test_str).day == 1
     assert str_to_date(test_str).month == 12
-    print(str_to_date(test_str).year)
+    assert str_to_date(test_str).year == 2021
 
 
 @patch('src.utils.requests.get')

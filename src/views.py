@@ -1,11 +1,12 @@
 import datetime
 import re
-from typing import List, Dict
+from typing import List, Dict, Optional
 import json
 
 import pandas as pd
 
 from src.decorators import to_json, apply_decorator
+from src.utils import str_to_date
 
 """
 The module of basic functions for generating JSON responses
@@ -28,7 +29,7 @@ YYYY-MM-DD HH:MM:SS  и возвращающую JSON-ответ со следу
 
 def expenses(transactions: List[Dict]) -> Dict:
     """функция возвращающая номера карт со списком расходов """
-    exp_dict = {}
+    exp_dict: dict = {}
 
     for trans in transactions:
         sum_op = float(trans['Сумма операции'])
@@ -52,14 +53,14 @@ def total_expenses(transactions: List[Dict]) -> Dict:
 
 def cashback(transactions: List[Dict]) -> dict:
     """функция возвращающая расчёт суммы кэшбэка с расходов по каждой карте"""
-    cash = {}
+    cash: dict = {}
     exp = expenses(transactions)
 
     for k, v in exp.items():
         for e in v:
             cash[k] = cash.get(k, 0.0)
             cash[k] = round(cash[k], 2) + abs(round(e / 100, 2))
-
+            cash[k] = round(cash[k], 2)
     return cash
 
 
@@ -112,11 +113,27 @@ def search_transactions(transactions: List[Dict], search_data: str) -> List[Dict
     return result
 
 
-def search_tr_in_data(transactions: List[Dict], date_max: datetime.datetime, date_min=None) -> List[Dict]:
+def search_tr_in_data(transactions: List[Dict],
+                      date_max: Optional[datetime.datetime | str],
+                      date_min: Optional[datetime.datetime | str] = None) -> List[Dict]:
     """функция поиска данных о банковских операций на диапазон дат"""
     result = []
-    if date_min is None:
-        date_min = date_max.replace(day=1)
+
+    if (date_max is None) or (date_max == ''):
+        date_max = datetime.datetime.now()
+
+    if isinstance(date_max, str):
+        date_max = str_to_date(date_max)
+
+    if (date_min is None) or (date_min == ''):
+        # расчитываем последние три месяца от переданной даты
+        delta = 3  # месяца
+        d2_mnth = (date_max.month - delta - 1) % 12 + 1
+        d2_year = date_max.year + (date_max.month - delta - 1) // 12
+        date_min = datetime.datetime(day=date_max.day, month=d2_mnth, year=d2_year)
+
+    if isinstance(date_min, str):
+        date_min = str_to_date(date_min)
 
     date_min_ = min(date_max, date_min)
     date_max_ = max(date_max, date_min)

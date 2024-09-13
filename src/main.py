@@ -1,13 +1,21 @@
 import datetime
 
+from src.reports import spending_by_category, spending_by_weekday, spending_by_workday
 from src.utils import get_currency_rate2, get_spx_index
 from src.views import greeting, total_expenses, get_transactions, search_tr_in_data, str_to_data, top5, cashback
 from collections import abc
 if __name__ == "__main__":
     tr = get_transactions("..\\data\\operations.xlsx")
-    tr_date = search_tr_in_data(tr, str_to_data('05.12.2021'))
+
     print(greeting())
-    print("На 05.12.2021 общая сумма расходов:")
+    print('Введите на дату(либо диапазон дат) для вывода статистики:')
+    date1 = input('введите превую дату:')
+    date2 = input('введите вторую дату либо пропустите:')
+    if date2 != '':
+        print(f"На период {date1} - {date2} общая сумма расходов:")
+    else:
+        print(f"На период {date1} общая сумма расходов за 3 мес.:")
+    tr_date = search_tr_in_data(tr, date1, date2)
     te=total_expenses(tr_date)
     for k in te:
         print(f"  карта {k} - {te[k]}")
@@ -29,7 +37,14 @@ if __name__ == "__main__":
     spx_lst = ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA"]
     for spx in spx_lst:
         print(spx, get_spx_index(spx)['price'])
-
+    category = input('Напишите по какой категории вывести транзакции:')
+    print('На какую дату(либо диапазон дат):')
+    date1 = input('введите превую дату:')
+    date2 = input('введите вторую дату либо пропустите:')
+    tr_cat = spending_by_category(tr, category, date1, date2)
+    print(f'транзакции по категории:\n{tr_cat}\n')
+    print(f'статистика по дням недели:\n{spending_by_weekday(tr_cat, date1, date2)}\n')
+    print(f'Итого в рабочие/выходные дни:\n{spending_by_workday(tr_cat, date1, date2)}\n')
 """
 Задачи по категориям:
    1. Веб-страницы:

@@ -21,22 +21,25 @@ def to_json(func: Callable) -> Callable:
     return wrapper
 
 
-def to_json_file(func: Callable) -> Callable:
+def to_json_file(f_name='output.json') -> Callable:
     """Декоратор для преобразования результата функции в JSON file."""
+    def decorator(func) -> Callable:
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+            result_dict = result
+            if isinstance(result, pd.DataFrame):
+                result_dict = df_to_list(result)
+            result_dict = {func.__name__: result_dict}
 
-    @wraps(func)
-    def wrapper(*args, **kwargs) -> str:
-        result = func(*args, **kwargs)
-        if isinstance(result, pd.DataFrame):
-            result = df_to_list(result)
-        result_dict = {func.__name__: result}
+            with open(f_name, 'w', encoding="utf-8") as file:
+                json.dump(result_dict, file, ensure_ascii=False)
 
-        with open('output.json', 'w') as file:
-            json.dump(result_dict, file, ensure_ascii=False)
+            return result
 
-        return result
+        return wrapper
 
-    return wrapper
+    return decorator
 
 
 def apply_decorator(funcs, decorator):
@@ -50,3 +53,6 @@ def df_to_list(transactions: pd.DataFrame):
     for v in range(columns):
         data_lst.append({k: str(transactions.loc[v, k]) for k in transactions.keys()})
     return data_lst
+
+
+
