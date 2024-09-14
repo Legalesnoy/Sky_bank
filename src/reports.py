@@ -25,8 +25,8 @@ def spending_by_category(transactions: pd.DataFrame | List[Dict], name_category:
         date1 = str_to_date(date1)
 
     if (date2 is None) or (date2 == ''):
-        #расчитываем последние три месяца от переданной даты
-        delta = 3  #месяца
+        # расчитываем последние три месяца от переданной даты
+        delta = 3  # месяца
         d2_mnth = (date1.month - delta - 1) % 12 + 1
         d2_year = date1.year + (date1.month - delta - 1) // 12
         date2 = datetime.datetime(day=date1.day, month=d2_mnth, year=d2_year)
@@ -85,8 +85,8 @@ def spending_by_weekday(transactions: pd.DataFrame | List[Dict],
 
     for day in expenses_lst.keys():
         s = sum(expenses_lst[day])
-        l = len(expenses_lst[day]) | 1
-        average_expenses[day] = round(s / l, 2)
+        l_ = len(expenses_lst[day]) | 1
+        average_expenses[day] = round(s / l_, 2)
 
     return pd.DataFrame.from_dict(average_expenses, orient='index', columns=['Средние траты']).reset_index().rename(
         columns={'index': 'День недели'})

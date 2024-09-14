@@ -1,6 +1,4 @@
 import datetime
-import json
-import re
 from typing import Dict, List, Optional
 
 import pandas as pd
@@ -10,14 +8,14 @@ from src.utils import str_to_date
 
 """
 The module of basic functions for generating JSON responses
- 
+
 """
 
 """
-Реализован набор функций и главную функцию, принимающую на вход строку с датой и временем в формате 
+Реализован набор функций и главную функцию, принимающую на вход строку с датой и временем в формате
 YYYY-MM-DD HH:MM:SS  и возвращающую JSON-ответ со следующими данными:
 
-Приветствие в формате 
+Приветствие в формате
 "???", где ??? — «Доброе утро» / «Добрый день» / «Добрый вечер» / «Доброй ночи» в зависимости от текущего времени.
 1. По каждой карте:
     последние 4 цифры карты;
@@ -163,9 +161,9 @@ if __name__ == "__main__":
     print(greeting(10))
     tr = get_transactions("..\\data\\operations.xlsx")
     print(top5(tr))
-    l = search_transactions(tr, '*5091')
-    input(f'найдено {len(l)} записей')
-    for t in l:
+    l_ = search_transactions(tr, '*5091')
+    input(f'найдено {len(l_)} записей')
+    for t in l_:
         print(t, '\n')
 
     # # dd = search_tr_in_data(tr, str_to_data('31.12.2021 16:42:04'))

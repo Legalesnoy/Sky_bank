@@ -53,6 +53,3 @@ def df_to_list(transactions: pd.DataFrame):
     for v in range(columns):
         data_lst.append({k: str(transactions.loc[v, k]) for k in transactions.keys()})
     return data_lst
-
-
-

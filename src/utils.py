@@ -1,9 +1,7 @@
 import datetime
 import json
-import logging
 import os
 import re
-import xml.etree.ElementTree as ET
 from typing import Dict, List, Tuple
 
 import requests
@@ -106,7 +104,7 @@ def get_spx_index(stock, date: str | datetime.date = datetime.datetime.now().dat
     if type(date) is str:
         date = str_to_date(date)
     API_KEY_STOCK = os.environ.get('API_KEY_STOCK')
-    url = f"https://www.alphavantage.co/query"
+    url = "https://www.alphavantage.co/query"
     header = {'apikey': API_KEY_STOCK}
     params = {'function': 'GLOBAL_QUOTE',
               'symbol': stock,

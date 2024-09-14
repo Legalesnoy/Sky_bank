@@ -1,11 +1,10 @@
 import datetime
-from collections import abc
 
 from src.reports import (spending_by_category, spending_by_weekday,
                          spending_by_workday)
 from src.utils import get_currency_rate2, get_spx_index
 from src.views import (cashback, get_transactions, greeting, search_tr_in_data,
-                       str_to_data, top5, total_expenses)
+                       top5, total_expenses)
 
 if __name__ == "__main__":
     tr = get_transactions("..\\data\\operations.xlsx")
@@ -19,7 +18,7 @@ if __name__ == "__main__":
     else:
         print(f"На период {date1} общая сумма расходов за 3 мес.:")
     tr_date = search_tr_in_data(tr, date1, date2)
-    te=total_expenses(tr_date)
+    te = total_expenses(tr_date)
     for k in te:
         print(f"  карта {k} - {te[k]}")
     cash = cashback(tr_date)
@@ -48,21 +47,3 @@ if __name__ == "__main__":
     print(f'транзакции по категории:\n{tr_cat}\n')
     print(f'статистика по дням недели:\n{spending_by_weekday(tr_cat, date1, date2)}\n')
     print(f'Итого в рабочие/выходные дни:\n{spending_by_workday(tr_cat, date1, date2)}\n')
-"""
-Задачи по категориям:
-   1. Веб-страницы:
-        Главная
-        События
-        
-   2. Сервисы:
-        Выгодные категории повышенного кешбэка
-        Инвесткопилка
-        Простой поиск
-        Поиск по телефонным номерам
-        Поиск переводов физическим лицам
-        
-   3. Отчеты:
-        Траты по категории
-        Траты по дням недели
-        Траты в рабочий/выходной день
-"""
