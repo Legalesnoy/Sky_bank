@@ -1,10 +1,12 @@
 import datetime
 import json
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
+
 import pandas as pd
-from src.utils import str_to_date
-from src.views import search_transactions, search_tr_in_data
+
 from src.decorators import apply_decorator, to_json, to_json_file
+from src.utils import str_to_date
+from src.views import search_tr_in_data, search_transactions
 
 
 def df_to_list(transactions: pd.DataFrame):
@@ -122,8 +124,8 @@ def spending_by_workday(transactions: pd.DataFrame | List[Dict],
 
 
 if __name__ == "__main__":
-    from src.views import greeting, get_transactions
     from src.decorators import apply_decorator, to_json, to_json_file
+    from src.views import get_transactions, greeting
 
     spending_by_category, spending_by_weekday, spending_by_workday = (
         apply_decorator([spending_by_category, spending_by_weekday, spending_by_workday], to_json_file()))

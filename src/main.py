@@ -1,9 +1,12 @@
 import datetime
-
-from src.reports import spending_by_category, spending_by_weekday, spending_by_workday
-from src.utils import get_currency_rate2, get_spx_index
-from src.views import greeting, total_expenses, get_transactions, search_tr_in_data, str_to_data, top5, cashback
 from collections import abc
+
+from src.reports import (spending_by_category, spending_by_weekday,
+                         spending_by_workday)
+from src.utils import get_currency_rate2, get_spx_index
+from src.views import (cashback, get_transactions, greeting, search_tr_in_data,
+                       str_to_data, top5, total_expenses)
+
 if __name__ == "__main__":
     tr = get_transactions("..\\data\\operations.xlsx")
 

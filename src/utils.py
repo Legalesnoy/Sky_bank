@@ -1,14 +1,14 @@
+import datetime
 import json
 import logging
 import os
-import datetime
-from typing import List, Dict, Tuple
+import re
+import xml.etree.ElementTree as ET
+from typing import Dict, List, Tuple
 
 import requests
 import xmltodict
 from dotenv import load_dotenv
-import xml.etree.ElementTree as ET
-import re
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")

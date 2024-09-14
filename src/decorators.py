@@ -1,8 +1,8 @@
 import json
 from functools import wraps
 from typing import Callable
-import pandas as pd
 
+import pandas as pd
 
 # from src.reports import df_to_list
 
