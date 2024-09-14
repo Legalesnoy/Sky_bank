@@ -10,21 +10,24 @@ from src.views import search_tr_in_data, search_transactions
 
 
 def df_to_list(transactions: pd.DataFrame):
-    return list(transactions.to_dict('index').values())
+    return list(transactions.to_dict("index").values())
 
 
-def spending_by_category(transactions: pd.DataFrame | List[Dict], name_category: str,
-                         date1: Optional[str | datetime.datetime] = None,
-                         date2: Optional[str | datetime.datetime] = None):
+def spending_by_category(
+    transactions: pd.DataFrame | List[Dict],
+    name_category: str,
+    date1: Optional[str | datetime.datetime] = None,
+    date2: Optional[str | datetime.datetime] = None,
+):
     """Функция возвращает траты по заданной категории за последние три месяца (от переданной даты)"""
 
-    if (date1 is None) or (date1 == ''):
+    if (date1 is None) or (date1 == ""):
         date1 = datetime.datetime.now()
 
     if isinstance(date1, str):
         date1 = str_to_date(date1)
 
-    if (date2 is None) or (date2 == ''):
+    if (date2 is None) or (date2 == ""):
         # расчитываем последние три месяца от переданной даты
         delta = 3  # месяца
         d2_mnth = (date1.month - delta - 1) % 12 + 1
@@ -45,12 +48,14 @@ def spending_by_category(transactions: pd.DataFrame | List[Dict], name_category:
     return pd.DataFrame(result)
 
 
-def spending_by_weekday(transactions: pd.DataFrame | List[Dict],
-                        date1: Optional[str | datetime.datetime] = None,
-                        date2: Optional[str | datetime.datetime] = None) -> pd.DataFrame:
+def spending_by_weekday(
+    transactions: pd.DataFrame | List[Dict],
+    date1: Optional[str | datetime.datetime] = None,
+    date2: Optional[str | datetime.datetime] = None,
+) -> pd.DataFrame:
     """Функция возвращает средние траты в каждый из дней недели за последние три месяца
-       от переданной даты либо диапазона дат"""
-    weekday = ['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота', 'воскресенье']
+    от переданной даты либо диапазона дат"""
+    weekday = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"]
     expenses_lst: dict = {k: [] for k in weekday}
     average_expenses = {k: 0.0 for k in weekday}
 
@@ -58,13 +63,13 @@ def spending_by_weekday(transactions: pd.DataFrame | List[Dict],
         data_lst = df_to_list(transactions)
     else:
         data_lst = transactions
-    if (date1 is None) or (date1 == ''):
+    if (date1 is None) or (date1 == ""):
         date1 = datetime.datetime.now()
 
     if isinstance(date1, str):
         date1 = str_to_date(date1)
 
-    if (date2 is None) or (date2 == ''):
+    if (date2 is None) or (date2 == ""):
         # расчитываем последние три месяца от переданной даты
         delta = 3  # месяца
         d2_mnth = (date1.month - delta - 1) % 12 + 1
@@ -77,9 +82,9 @@ def spending_by_weekday(transactions: pd.DataFrame | List[Dict],
     data = search_tr_in_data(data_lst, date1, date2)
 
     for oprtn in data:
-        dt_op = str_to_date(oprtn['Дата операции'])  # date_operation
+        dt_op = str_to_date(oprtn["Дата операции"])  # date_operation
         d = weekday[dt_op.weekday()]
-        expense = float(oprtn['Сумма платежа'])
+        expense = float(oprtn["Сумма платежа"])
         if expense < 0:  # наверное, пополнения не учитываем - только расходы
             expenses_lst[d].append(-expense)
 
@@ -88,17 +93,22 @@ def spending_by_weekday(transactions: pd.DataFrame | List[Dict],
         l_ = len(expenses_lst[day]) | 1
         average_expenses[day] = round(s / l_, 2)
 
-    return pd.DataFrame.from_dict(average_expenses, orient='index', columns=['Средние траты']).reset_index().rename(
-        columns={'index': 'День недели'})
+    return (
+        pd.DataFrame.from_dict(average_expenses, orient="index", columns=["Средние траты"])
+        .reset_index()
+        .rename(columns={"index": "День недели"})
+    )
 
 
-def spending_by_workday(transactions: pd.DataFrame | List[Dict],
-                        date1: Optional[str | datetime.datetime] = None,
-                        date2: Optional[str | datetime.datetime] = None) -> pd.DataFrame:
+def spending_by_workday(
+    transactions: pd.DataFrame | List[Dict],
+    date1: Optional[str | datetime.datetime] = None,
+    date2: Optional[str | datetime.datetime] = None,
+) -> pd.DataFrame:
     """Функция возвращает средние траты в каждый из дней недели за последние три месяца
     от переданной даты либо диапазона дат."""
 
-    expenses = {'рабочие дни': 0.0, 'выходные': 0.0}
+    expenses = {"рабочие дни": 0.0, "выходные": 0.0}
 
     if isinstance(transactions, pd.DataFrame):
         transactions = df_to_list(transactions)
@@ -108,27 +118,31 @@ def spending_by_workday(transactions: pd.DataFrame | List[Dict],
         s_w = json.loads(s_w)
         first_key = list(s_w.keys())[0]
         s_w = pd.DataFrame(s_w[first_key])
-    average_expenses = dict(zip(s_w['День недели'], s_w['Средние траты'])).values()
+    average_expenses = dict(zip(s_w["День недели"], s_w["Средние траты"])).values()
 
     for d, trans in enumerate(average_expenses):
         if d < 5:
-            expenses['рабочие дни'] += float(trans)
+            expenses["рабочие дни"] += float(trans)
         else:
-            expenses['выходные'] += float(trans)
+            expenses["выходные"] += float(trans)
 
-    expenses['рабочие дни'] = round(expenses['рабочие дни'] / 5, 2)
-    expenses['выходные'] = round(expenses['выходные'] / 2, 2)
+    expenses["рабочие дни"] = round(expenses["рабочие дни"] / 5, 2)
+    expenses["выходные"] = round(expenses["выходные"] / 2, 2)
 
-    return pd.DataFrame.from_dict(expenses, orient='index', columns=['Средние траты']).reset_index().rename(
-        columns={'index': 'Дни недели'})
+    return (
+        pd.DataFrame.from_dict(expenses, orient="index", columns=["Средние траты"])
+        .reset_index()
+        .rename(columns={"index": "Дни недели"})
+    )
 
 
 if __name__ == "__main__":
     from src.decorators import apply_decorator, to_json, to_json_file
     from src.views import get_transactions, greeting
 
-    spending_by_category, spending_by_weekday, spending_by_workday = (
-        apply_decorator([spending_by_category, spending_by_weekday, spending_by_workday], to_json_file()))
+    spending_by_category, spending_by_weekday, spending_by_workday = apply_decorator(
+        [spending_by_category, spending_by_weekday, spending_by_workday], to_json_file()
+    )
     # spending_by_category, spending_by_weekday, spending_by_workday = (
     #     apply_decorator([spending_by_category, spending_by_weekday, spending_by_workday], to_json))
 
@@ -140,7 +154,7 @@ if __name__ == "__main__":
     # print(tr[0:5])
     # print()
     # print(df_lst[0:5])
-    tr_cat = spending_by_category(tr_df, 'Каршеринг', '01.01.2024', '01.01.2017')
+    tr_cat = spending_by_category(tr_df, "Каршеринг", "01.01.2024", "01.01.2017")
     print(tr_cat)
-    print(spending_by_weekday(tr_cat, '01.01.2024', '01.01.2017'))
-    print(spending_by_workday(tr_cat, '01.01.2024', '01.01.2017'))
+    print(spending_by_weekday(tr_cat, "01.01.2024", "01.01.2017"))
+    print(spending_by_workday(tr_cat, "01.01.2024", "01.01.2017"))

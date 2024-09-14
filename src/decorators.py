@@ -21,8 +21,9 @@ def to_json(func: Callable) -> Callable:
     return wrapper
 
 
-def to_json_file(f_name='output.json') -> Callable:
+def to_json_file(f_name="output.json") -> Callable:
     """Декоратор для преобразования результата функции в JSON file."""
+
     def decorator(func) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -32,7 +33,7 @@ def to_json_file(f_name='output.json') -> Callable:
                 result_dict = df_to_list(result)
             result_dict = {func.__name__: result_dict}
 
-            with open(f_name, 'w', encoding="utf-8") as file:
+            with open(f_name, "w", encoding="utf-8") as file:
                 json.dump(result_dict, file, ensure_ascii=False)
 
             return result

@@ -26,15 +26,15 @@ YYYY-MM-DD HH:MM:SS  и возвращающую JSON-ответ со следу
 
 
 def expenses(transactions: List[Dict]) -> Dict:
-    """функция возвращающая номера карт со списком расходов """
+    """функция возвращающая номера карт со списком расходов"""
     exp_dict: dict = {}
 
     for trans in transactions:
-        sum_op = float(trans['Сумма операции'])
+        sum_op = float(trans["Сумма операции"])
 
         if sum_op < 0:
-            exp_dict[trans['Номер карты']] = exp_dict.get(trans['Номер карты'], list())
-            exp_dict[trans['Номер карты']].append(sum_op)
+            exp_dict[trans["Номер карты"]] = exp_dict.get(trans["Номер карты"], list())
+            exp_dict[trans["Номер карты"]].append(sum_op)
 
     return exp_dict
 
@@ -65,7 +65,7 @@ def cashback(transactions: List[Dict]) -> dict:
 def top5(transactions: List[Dict]) -> list[dict]:
     """функция возвращающая топ 5 транзакций по сумме платежа"""
 
-    transactions.sort(key=lambda x: float(x['Сумма операции']))
+    transactions.sort(key=lambda x: float(x["Сумма операции"]))
     return transactions[0:5]
 
 
@@ -111,19 +111,21 @@ def search_transactions(transactions: List[Dict], search_data: str) -> List[Dict
     return result
 
 
-def search_tr_in_data(transactions: List[Dict],
-                      date_max: Optional[datetime.datetime | str],
-                      date_min: Optional[datetime.datetime | str] = None) -> List[Dict]:
+def search_tr_in_data(
+    transactions: List[Dict],
+    date_max: Optional[datetime.datetime | str],
+    date_min: Optional[datetime.datetime | str] = None,
+) -> List[Dict]:
     """функция поиска данных о банковских операций на диапазон дат"""
     result = []
 
-    if (date_max is None) or (date_max == ''):
+    if (date_max is None) or (date_max == ""):
         date_max = datetime.datetime.now()
 
     if isinstance(date_max, str):
         date_max = str_to_date(date_max)
 
-    if (date_min is None) or (date_min == ''):
+    if (date_min is None) or (date_min == ""):
         # расчитываем последние три месяца от переданной даты
         delta = 3  # месяца
         d2_mnth = (date_max.month - delta - 1) % 12 + 1
@@ -137,7 +139,7 @@ def search_tr_in_data(transactions: List[Dict],
     date_max_ = max(date_max, date_min)
 
     for trans in transactions:
-        dt = str_to_data(trans['Дата операции'])
+        dt = str_to_data(trans["Дата операции"])
         if date_min_ <= dt <= date_max_:
             result.append(trans)
 
@@ -156,15 +158,16 @@ def str_to_data(date_string: str) -> datetime.datetime:
 
 
 if __name__ == "__main__":
-    greeting, top5, cashback, total_expenses, expenses = apply_decorator([greeting, top5, cashback,
-                                                                          total_expenses, expenses], to_json)
+    greeting, top5, cashback, total_expenses, expenses = apply_decorator(
+        [greeting, top5, cashback, total_expenses, expenses], to_json
+    )
     print(greeting(10))
     tr = get_transactions("..\\data\\operations.xlsx")
     print(top5(tr))
-    l_ = search_transactions(tr, '*5091')
-    input(f'найдено {len(l_)} записей')
+    l_ = search_transactions(tr, "*5091")
+    input(f"найдено {len(l_)} записей")
     for t in l_:
-        print(t, '\n')
+        print(t, "\n")
 
     # # dd = search_tr_in_data(tr, str_to_data('31.12.2021 16:42:04'))
     # # for d in dd:

@@ -20,13 +20,13 @@ API_KEY = os.getenv("API_KEY")
 
 def str_to_date(date_str: str) -> datetime.datetime:
     """функция преобразует строку в формат datetime"""
-    time_str = '00:00:00'
+    time_str = "00:00:00"
 
-    if len(date_str) > len('01/01/1999 '):
-        str_1, str_2 = date_str.split(' ', 1)
-        if ':' in str_1:
+    if len(date_str) > len("01/01/1999 "):
+        str_1, str_2 = date_str.split(" ", 1)
+        if ":" in str_1:
             time_str, date_str = str_1, str_2
-        elif ':' in str_2:
+        elif ":" in str_2:
             time_str, date_str = str_2, str_1
 
     time_format = "%H:%M:%S"
@@ -39,19 +39,20 @@ def str_to_date(date_str: str) -> datetime.datetime:
         d_month = [m for m in date_lst if 0 < m <= 12][-1]
         date_lst.remove(d_month)
         d_day = date_lst[0]
-        return datetime.datetime(year=d_year, month=d_month, day=d_day,
-                                 hour=time_.hour, minute=time_.minute, second=time_.second)
+        return datetime.datetime(
+            year=d_year, month=d_month, day=d_day, hour=time_.hour, minute=time_.minute, second=time_.second
+        )
     except ValueError:
         raise ValueError("Неверный формат даты")
 
 
 def get_currency_rate1(date: str | datetime.date, currency_code: List | str) -> Dict:
-    """функция получающая курс валюты, json """
+    """функция получающая курс валюты, json"""
     if type(date) is str:
         date = str_to_date(date)
     url = "https://www.cbr-xml-daily.ru/daily_json.js"
     header = {"apikey": API_KEY}
-    params = {'date_req': date.strftime('%d/%m/%Y')}
+    params = {"date_req": date.strftime("%d/%m/%Y")}
     response = requests.get(url, headers=header, params=params)
 
     if response.status_code != 200:
@@ -75,21 +76,25 @@ def get_currency_rate2(date: str | datetime.date, currency_code: Tuple[str, ...]
     """функция получающая курс валюты, XML"""
     if type(date) is str:
         date = str_to_date(date)
-    url = 'http://www.cbr.ru/scripts/XML_daily.asp'
-    params = {'date_req': date.strftime("%d/%m/%Y")}
-    header = {'apikey': API_KEY}
+    url = "http://www.cbr.ru/scripts/XML_daily.asp"
+    params = {"date_req": date.strftime("%d/%m/%Y")}
+    header = {"apikey": API_KEY}
     response = requests.get(url, headers=header, params=params, stream=True)
     if response.status_code != 200:
-        raise ValueError(f'Failed to get currency rate for date {date}')
+        raise ValueError(f"Failed to get currency rate for date {date}")
 
-    currency_data = xmltodict.parse(response.content)['ValCurs']['Valute']
-    currency_data = filter(lambda x: x['CharCode'] in currency_code, currency_data)
+    currency_data = xmltodict.parse(response.content)["ValCurs"]["Valute"]
+    currency_data = filter(lambda x: x["CharCode"] in currency_code, currency_data)
 
     rates = []
     for rate in currency_data:
-        rates.append({'date': date.strftime("%d.%m.%Y"),
-                      'currency_code': rate.get('CharCode'),
-                      'rate': round(float(rate.get('VunitRate').replace(',', '.')), 2)})
+        rates.append(
+            {
+                "date": date.strftime("%d.%m.%Y"),
+                "currency_code": rate.get("CharCode"),
+                "rate": round(float(rate.get("VunitRate").replace(",", ".")), 2),
+            }
+        )
 
     with open("user_settings.json", "w") as file:
         json.dump(rates, file)
@@ -99,30 +104,27 @@ def get_currency_rate2(date: str | datetime.date, currency_code: Tuple[str, ...]
 
 def get_spx_index(stock, date: str | datetime.date = datetime.datetime.now().date()) -> Dict:
     """Функция возвращающая курс акций"""
-    stock_price = {'stock': stock,
-                   'price': 'undefined'}
+    stock_price = {"stock": stock, "price": "undefined"}
     if type(date) is str:
         date = str_to_date(date)
-    API_KEY_STOCK = os.environ.get('API_KEY_STOCK')
+    API_KEY_STOCK = os.environ.get("API_KEY_STOCK")
     url = "https://www.alphavantage.co/query"
-    header = {'apikey': API_KEY_STOCK}
-    params = {'function': 'GLOBAL_QUOTE',
-              'symbol': stock,
-              'date': date.strftime("%Y-%m-%d")}
+    header = {"apikey": API_KEY_STOCK}
+    params = {"function": "GLOBAL_QUOTE", "symbol": stock, "date": date.strftime("%Y-%m-%d")}
     params.update(header)
 
     resp = requests.get(url, params=params)
 
     if resp.status_code == 200:
         json_dct = dict(resp.json())
-        price = json_dct.get('Global Quote', {}).get('05. price', None)
-        stock_price['price'] = price
+        price = json_dct.get("Global Quote", {}).get("05. price", None)
+        stock_price["price"] = price
 
     return stock_price
 
 
 if __name__ == "__main__":
-    print(get_currency_rate2('1/12/2021', 'USD'))
+    print(get_currency_rate2("1/12/2021", "USD"))
     print(get_spx_index("AAPL"))
     # print(get_currency_rate(datetime.datetime.now().date(),'EUR'))
     # print(get_currency_rate(datetime.datetime.now().date(),'CNY'))

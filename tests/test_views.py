@@ -1,19 +1,27 @@
 import os
 
-from src.views import expenses, get_transactions, total_expenses, cashback, top5, greeting, search_transactions, \
-    str_to_data
+from src.views import (
+    expenses,
+    get_transactions,
+    total_expenses,
+    cashback,
+    top5,
+    greeting,
+    search_transactions,
+    str_to_data,
+)
 
 
 def test_expenses(transactions):
-    assert len(expenses(transactions)['*7197']) == 4811
+    assert len(expenses(transactions)["*7197"]) == 4811
 
 
 def test_total_expenses(transactions):
-    assert total_expenses(transactions)['*7197'] == 2_389_912.73
+    assert total_expenses(transactions)["*7197"] == 2_389_912.73
 
 
 def test_cashback(transactions):
-    assert cashback(transactions)['*7197'] == 23_899.78
+    assert cashback(transactions)["*7197"] == 23_899.78
 
 
 def test_top5(transactions):
@@ -21,11 +29,11 @@ def test_top5(transactions):
 
 
 def test_greeting():
-    assert greeting(0) == 'Доброй ночи!'
+    assert greeting(0) == "Доброй ночи!"
 
 
 def test_get_transactions():
-    if 'tests' in os.getcwd():
+    if "tests" in os.getcwd():
         file_name = "..\\data\\operations.xlsx"
     else:
         file_name = "data\\operations.xlsx"
@@ -34,13 +42,13 @@ def test_get_transactions():
 
 
 def test_search_transactions(transactions):
-    search_data = '31.12.2021 16:42:04'
-    field = 'Дата операции'
+    search_data = "31.12.2021 16:42:04"
+    field = "Дата операции"
     assert search_transactions(transactions, search_data)[0][field] == search_data
 
 
 def test_str_to_data():
-    test_str = '31.12.2021 16:42:04'
+    test_str = "31.12.2021 16:42:04"
     assert str_to_data(test_str).day == 31
     assert str_to_data(test_str).month == 12
     assert str_to_data(test_str).year == 2021
